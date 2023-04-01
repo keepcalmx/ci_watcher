@@ -1,0 +1,21 @@
+owners:
+  -
+    id: 'x30043367'
+    name: "向峰"
+  -
+    id: 't30032423'
+    name: "唐佳乐"
+
+cases:
+  -
+    id: '10001'
+    name: '测试Max函数'
+    owner_id: 'x30043367'
+    work_dir: 'CENT/driver/go/test1'
+    command: 'go test -timeout 100s'
+  -
+    id: '10002'
+    name: '测试Roman函数'
+    owner_id: 't30032423'
+    work_dir: 'CENT/driver/go/test2'
+    command: 'go test -timeout 100s'
