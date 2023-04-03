@@ -8,14 +8,42 @@ owners:
 
 cases:
   -
-    id: '10001'
+    id: 'f7e0355068434b67'
     name: '测试Max函数'
     owner_id: 'x30043367'
+    env_type: 'SSH_CENT'
     work_dir: 'CENT/driver/go/test1'
-    command: 'go test -timeout 100s'
+    executor: 'go'
   -
-    id: '10002'
+    id: '505d541701e547b8'
+    name: '测试斐波那契数列'
+    owner_id: 'x30043367'
+    env_type: 'SSH_CENT'
+    work_dir: 'CENT/driver/go/test_fib'
+    executor: 'go'
+  -
+    id: '93fe1ed716514b4a'
     name: '测试Roman函数'
     owner_id: 't30032423'
+    env_type: 'SSH_CENT'
     work_dir: 'CENT/driver/go/test2'
-    command: 'go test -timeout 100s'
+    executor: 'go'
+
+# pick up an uuid below then delete it
+# bea1adfdeb3f49c7
+# 0c30a602bd564b34
+# 88eb25e35ab042bf
+# d54a11fc577b4f4b
+# a108a910fef14885
+# f213bfb74dfe4708
+# 125103b7c5fc4a82
+# ebf2fea134df44fb
+# c66d09c916404d0d
+# 1133d4e0d72e45bb
+# d47137168246412f
+# 8ed491aacf524d12
+# 7628979a62e149ef
+# 31e8e1c4632f4b7b
+# 04b8740740054ebe
+# 300b7442ac5f4c77
+# 59dc2da13c5948ea

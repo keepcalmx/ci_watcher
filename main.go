@@ -1,7 +1,11 @@
 package main
 
-func main() {
-	// 解析yaml配置文件
+import "ci_watcher/orm"
 
-	NewScheduler().Start()
+func main() {
+	go orm.Migrate()
+
+	go NewRESTfulAPI().Serve()
+
+	GetScheduler().Start()
 }

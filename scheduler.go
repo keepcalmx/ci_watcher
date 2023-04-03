@@ -2,27 +2,40 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
+	"sync"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
 )
 
-type Scheduler struct {
-	Tasks chan Task
+var (
+	once      sync.Once
+	Scheduler *scheduler
+)
+
+// 单例模式
+func GetScheduler() *scheduler {
+	once.Do(func() {
+		Scheduler = &scheduler{
+			pq:    NewPriorityQueue(3),
+			count: 0,
+			executors: map[string]Executor{
+				GO:  &GoExecutor{},
+				GRT: &GRTExecutor{},
+				UTS: &UTSExecutor{},
+			},
+		}
+	})
+	return Scheduler
 }
 
-func NewScheduler() *Scheduler {
-	return &Scheduler{
-		Tasks: make(chan Task, 100),
-	}
+type scheduler struct {
+	count     int
+	pq        *PriorityQueue
+	executors map[string]Executor
 }
 
-func (s *Scheduler) WatchNewCommit() {
+func (s *scheduler) WatchNewCommit() {
 	// 监听新的git commit提交
-
 	go func() {
 		for {
 			time.Sleep(time.Second)
@@ -30,7 +43,7 @@ func (s *Scheduler) WatchNewCommit() {
 	}()
 }
 
-func (s *Scheduler) WatchNewVersion() {
+func (s *scheduler) WatchNewVersion() {
 	// 监听是否刷新新版本
 	go func() {
 		for {
@@ -39,61 +52,50 @@ func (s *Scheduler) WatchNewVersion() {
 	}()
 }
 
-func (s *Scheduler) WatchAPIs() {
-	// 监听是否手动拉起任务
-	go func() {
+func (s *scheduler) NewTask(taskID string, priority int) {
+	t := NewGoTask(taskID, priority)
 
-		app := fiber.New()
-
-		app.Get("/ping", func(c *fiber.Ctx) error {
-			return c.SendString("pong")
-		})
-
-		app.Get("/task", func(c *fiber.Ctx) error {
-			s.Tasks <- Task{
-				Name:    "go驱动支持pbe",
-				WorkDir: "CENT/driver/go/roman",
-				Command: "go test",
-			}
-			return c.JSON("success")
-		})
-
-		app.Get("/metrics", monitor.New(monitor.Config{Title: "MyService Metrics Page"}))
-
-		log.Fatal(app.Listen(":9000"))
-	}()
+	s.pq.Push(t)
+	s.count++
+	fmt.Println("total task count: ", s.count)
 }
 
-func (s *Scheduler) Start() {
+func (s *scheduler) GetTaskCount() int {
+	return s.count
+}
+
+func (s *scheduler) Start() {
 	s.WatchNewCommit()
 	s.WatchNewVersion()
-	s.WatchAPIs()
 
 	for {
 		select {
-		case t := <-s.Tasks:
-			fmt.Println(1)
-			// 调度用例执行
-			fmt.Println(s.Bash("cd ./cases/" + t.WorkDir + " && go test"))
+		case <-s.pq.Waiting():
+			t := s.Produce()
+			s.Consume(t)
 		}
 	}
-
 }
 
-func (s *Scheduler) Bash(cmd string) string {
+func (s *scheduler) Produce() Task {
+	return s.pq.Produce()
+}
+
+func (s *scheduler) Consume(t Task) {
+	s.executors[t.GetExecutor()].ExecuteTask(t)
+	s.count -= 1
+}
+
+func Bash(cmd string) (status string, ret string) {
+	status = "success"
 	c := exec.Command("/bin/bash", "-c", cmd)
 	out, err := c.CombinedOutput()
 	if err != nil {
 		fmt.Printf("combined out:\n%s\n", string(out))
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		status = "failed"
+		// log.Fatalf("cmd.Run() failed with %s\n", err)
 	}
-	// fmt.Println(c.String(), ":")
-	// fmt.Println(string(out))
-	return string(out)
-}
 
-type Task struct {
-	Name    string
-	WorkDir string
-	Command string
+	ret = string(out)
+	return
 }
