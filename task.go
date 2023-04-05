@@ -1,5 +1,7 @@
 package main
 
+import "ci_watcher/orm"
+
 // Task 任务接口
 type Task interface {
 	GetID() string
@@ -9,6 +11,7 @@ type Task interface {
 
 // GoTask Go单测任务
 type GoTask struct {
+	orm.CaseInfo
 	ID       string
 	Err      error
 	priority int
