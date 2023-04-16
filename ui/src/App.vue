@@ -2,7 +2,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const activeIndex = ref('1')
+const activeIndex = ref('Overview')
+const handleSelect = (key: string, keyPath: string[]) => {
+  router.push({ name: key })
+}
 
 const router = useRouter()
 const toOverview = () => {
@@ -21,13 +24,12 @@ const toCaseLog = () => {
   <div class="common-layout">
     <el-container>
       <el-header>
-        <el-menu :default-active="activeIndex" mode="horizontal" :ellipsis="false">
-          <el-menu-item index="0">VISUAL PIPELINE DASHBORD</el-menu-item>
-          <!-- <div class="flex-grow" /> -->
-          <el-menu-item index="1" @click="toOverview">概览</el-menu-item>
-          <el-menu-item index="2" @click="toTestCase">用例</el-menu-item>
-          <el-menu-item index="3" @click="toCaseLog">日志</el-menu-item>
-          <el-menu-item index="3" @click="toCaseLog">环境</el-menu-item>
+        <el-menu :default-active="activeIndex" mode="horizontal" :ellipsis="false" @select="handleSelect">
+          <el-menu-item index="log">VISUAL PIPELINE DASHBORD</el-menu-item>
+          <el-menu-item index="Overview">概览</el-menu-item>
+          <el-menu-item index="TestCase">用例</el-menu-item>
+          <el-menu-item index="CaseLog">日志</el-menu-item>
+          <el-menu-item index="EnvOps">环境</el-menu-item>
         </el-menu>
       </el-header>
       <el-main>

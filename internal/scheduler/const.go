@@ -1,4 +1,4 @@
-package main
+package scheduler
 
 const GO = "go"
 const GRT = "grt"

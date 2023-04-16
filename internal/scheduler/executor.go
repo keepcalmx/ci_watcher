@@ -1,7 +1,7 @@
-package main
+package scheduler
 
 import (
-	"ci_watcher/orm"
+	"ci_watcher/internal/orm"
 	"context"
 	"fmt"
 

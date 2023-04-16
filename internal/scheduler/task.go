@@ -1,6 +1,6 @@
-package main
+package scheduler
 
-import "ci_watcher/orm"
+import "ci_watcher/internal/orm"
 
 // Task 任务接口
 type Task interface {
